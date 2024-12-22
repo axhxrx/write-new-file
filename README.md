@@ -24,7 +24,11 @@ However, it probably doesn't work on Windows. Such is life...😭
 
 ## Happenings
 
-### 👹 2024-12-22: initial working version
+### 👹 2024-12-22: v0.0.2
+
+No changes other than fixing the JSR publishing automation.
+
+### 👹 2024-12-22: initial working version v0.0.1
 
 @masonmark: Well, this was harder than I expected, but here is the first working implementation of the actual atomic write with guaranteed-complete reads.
 
