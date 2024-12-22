@@ -16,7 +16,7 @@ example~2024-12-22-16-39-42+225.txt
 
 Or, on the CLI:
 ```bash
-URL="https://jsr.io/@axhxrx/write-new-file/0.0.4/mod.ts" \
+URL="https://jsr.io/@axhxrx/write-new-file/0.0.5/mod.ts" \
 && deno run -RW $URL fu-world.txt "🖕🌏" \
 && deno run -RW $URL fu-world.txt "🖕🌏" \
 && deno run -RW $URL fu-world.txt "🖕🌎" \
