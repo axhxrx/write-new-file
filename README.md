@@ -1,6 +1,8 @@
-# write-new-file
+# @axhxrx/write-new-file
 
-A library and CLI tool for writing new files to a directory. If the destination file already exists, it is not overwritten, but rather a unique, lexicographically sequential suffix is added to the file name (before the file extension).
+> **TL;DR** — I want to write files to a directory, perhaps concurrently from multiple processes, but I don't want to overwrite existing files, and I don't want to have to worry about file naming collisions. I also might want to have other processes watching for new files and consuming them, but I don't want to have to worry about partial file reads. I also want the files to be listed in order in `ls -l` or a GUI file browser, so it is obvious at a glance what is going on.
+
+This is a library and CLI tool for writing new files to a directory. If the destination file already exists, it is not overwritten, but rather a unique, lexicographically sequential suffix is added to the file name (before the file extension).
 
 The specialization here is to write "new" files (that is, files that do not already exist) to a single directory, without needing write access to any other directory, and to have both file writes and file reads (presumably executed by external processes) be atomic — no partial writes *or* partial-file reads.
 
@@ -23,6 +25,10 @@ So, this library's implementation uses `Deno.link()` to achieve atomic file writ
 However, it probably doesn't work on Windows. Such is life...😭
 
 ## Happenings
+
+### 👹 2024-12-22: v0.0.3
+
+No functionality changes, just various improvements to the docs and formatting.
 
 ### 👹 2024-12-22: v0.0.2
 

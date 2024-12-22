@@ -55,12 +55,12 @@ Deno.test('writeNewFile: basic usage', async () =>
 
  That simulates the situation where not only is the proposed file name already in use by a different file, so the our initial attempt to write to the proposed filename should fail.
 
-2) We manually create a file called something like 'example~2024-12-22-02-30-42.txt'
+ 2) We manually create a file called something like 'example~2024-12-22-02-30-42.txt'
 
-That simulates the situation where `writeNewFile()` has already been called during the current second, either by our process or some other process, meaning that writing to the first proposed unique name should also fail.
+ That simulates the situation where `writeNewFile()` has already been called during the current second, either by our process or some other process, meaning that writing to the first proposed unique name should also fail.
 
-Given that setup, we can assert that `tryCreateFile()` returns false as expected, but that `writeNewFile()` succeeds (because it keeps trying until it does), and for good measure one more `writeNewFile()` also succeeds, and to verify they have done so wee check that there are 4 total files with names like what we expect and the contents we expect. (Whew!)
- */
+ Given that setup, we can assert that `tryCreateFile()` returns false as expected, but that `writeNewFile()` succeeds (because it keeps trying until it does), and for good measure one more `writeNewFile()` also succeeds, and to verify they have done so wee check that there are 4 total files with names like what we expect and the contents we expect. (Whew!)
+*/
 Deno.test('tryCreateFile: some other process wrote a file that is in our way', async () =>
 {
   const filename = 'example.txt';

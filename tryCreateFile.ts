@@ -1,20 +1,20 @@
 /**
-   Attempt to create the file with the specified path. If it fails because it already exists, catch the error, and try again. If it fails for something else, just rethrow.
+ Attempt to create the file with the specified path. If it fails because it already exists, catch the error, and try again. If it fails for something else, just rethrow.
 
-   If it succeeds, write `data` and return `true`.
+ If it succeeds, write `data` and return `true`.
 
-   NOTE: This function is concurrency-safe, including atomicity for the file creation, and for consumers reading the output file. The files are written atomically to a temp file, and then renamed to the final path. However, consumers reading files from the directory (e.g. external watcher processes, etc.) must ignore the temp files, which are prefixed with `.__temp__`.
+ NOTE: This function is concurrency-safe, including atomicity for the file creation, and for consumers reading the output file. The files are written atomically to a temp file, and then renamed to the final path. However, consumers reading files from the directory (e.g. external watcher processes, etc.) must ignore the temp files, which are prefixed with `.__temp__`.
 
-   (We write them to the destination directory because the primary use case for this library is writing files to a directory that is read by external processes, and as such this writer may not have permission to write to any other location.)
+ (We write them to the destination directory because the primary use case for this library is writing files to a directory that is read by external processes, and as such this writer may not have permission to write to any other location.)
 
-   @param path The full path to the file we will try to create
+ @param path The full path to the file we will try to create
 
-   @param content The data to write (string or Uint8Array)
+ @param content The data to write (string or Uint8Array)
 
-   @returns `true` if the file was successfully created, `false` if it already existed
+ @returns `true` if the file was successfully created, `false` if it already existed
 
-   @throws Any error other than `Deno.errors.AlreadyExists` that occurs while attempting to create the file — e.g. disk full, permission error, etc
-   */
+ @throws Any error other than `Deno.errors.AlreadyExists` that occurs while attempting to create the file — e.g. disk full, permission error, etc
+*/
 export async function tryCreateFile(
   path: string,
   content: string | Uint8Array,
@@ -49,28 +49,28 @@ export async function tryCreateFile(
       file.close();
     }
     /*
-        @masonmark 2024-12-22: Wow, I was under a pretty major misapprehension about atomic writes in Deno. I thought `Deno.rename()` would be our jam, but in fact it only allows atomic writes — there's no way to detect/avoid overwriting an existing file.
+     @masonmark 2024-12-22: Wow, I was under a pretty major misapprehension about atomic writes in Deno. I thought `Deno.rename()` would be our jam, but in fact it only allows atomic writes — there's no way to detect/avoid overwriting an existing file.
 
-        Thank science for unit tests!
+     Thank science for unit tests!
 
-        I almost bailed on writing this in Deno — because there *are* other ways to do it, although they smell like fermented soybeans...
+     I almost bailed on writing this in Deno — because there *are* other ways to do it, although they smell like fermented soybeans...
 
-        But in this specific use case, I think Deno.link() meets all our requirements. It's atomic, and it fails if the target file already exists.
+     But in this specific use case, I think Deno.link() meets all our requirements. It's atomic, and it fails if the target file already exists.
 
-        The main downsides of link() are:
+      The main downsides of link() are:
 
-        - Can't reliably create hard links across different filesystems/mount points - but our temp files and the final file are in the same directory
+     - Can't reliably create hard links across different filesystems/mount points - but our temp files and the final file are in the same directory
 
-        - Some filesystems don't support hard links (like FAT32) - but most modern Unix filesystems do, so...
+     - Some filesystems don't support hard links (like FAT32) - but most modern Unix filesystems do, so...
 
-        - There may be filesystem-level limits on number of hard links per file - but this is OK since we immediately delete the temp file
+     - There may be filesystem-level limits on number of hard links per file - but this is OK since we immediately delete the temp file
 
-        - Hard links share inode/permissions with source file - I think we don't care, especially since we're deleting the temp file immediately, but that failing and something I am not thinking of will probably be the reason you find out in 2027 that some North Korean hacker has all your BTC (sorry (T_T)... )
+     - Hard links share inode/permissions with source file - I think we don't care, especially since we're deleting the temp file immediately, but that failing and something I am not thinking of will probably be the reason you find out in 2027 that some North Korean hacker has all your BTC (sorry (T_T)... )
 
-        - Some very restrictive systems might not allow hard links for security reasons (though they'd probably also restrict rename, so that's fine — not our target demographic)
+     - Some very restrictive systems might not allow hard links for security reasons (though they'd probably also restrict rename, so that's fine — not our target demographic)
 
-        So, since our mission here is to write temp files within a single directory, and then  The atomic guarantee from link() is worth these (hopefully-)theoretical downsides.
-      */
+     So, since our mission here is to write temp files within a single directory, and then  The atomic guarantee from link() is worth these (hopefully-)theoretical downsides.
+    */
 
     await Deno.link(tempPath, path);
     return true;

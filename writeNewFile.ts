@@ -7,19 +7,16 @@ import { WriteNewOptions } from './WriteNewOptions.ts';
  Writes data to a unique file path using a date-based suffix, in a concurrency-safe manner. That is, if some other process or thread writes a file at the same time, we will fail, increment the suffix and try again, until we succeed at writing a new and uniquely-named file.
 
  The logic is:
-   1. For the "current second" of the clock, try a suffix like:
-      "basename~YYYY-MM-DD HH:mm:ss.ext"
-   2. If that fails because it already exists, repeatedly:
-      a. Sleep 50ms
-      b. If the second is still the same, we try:
-         "basename~YYYY-MM-DD HH:mm:ssSSS.ext"
-         (where SSS is the millisecond portion)
-      c. If that also exists, keep looping in 50ms increments
-         until either we succeed or the clock moves on to a new second
-   3. Once the clock changes to a new second, start over at (1)
-      with the fresh second string.
+  1. If we can write the file with the proposed filename as-is, we're done. Otherwise:
+  2. For the "current second" of the clock, try a suffix like:
+      `'basename~YYYY-MM-DD HH:mm:ss.ext'`
+  3. If that fails because it already exists, repeatedly:
+      - Sleep 50ms
+      - If the second is still the same, we try: `'basename~YYYY-MM-DD HH:mm:ss+SSS.ext'` (where `SSS` is the millisecond portion)
+      - If that also exists, keep looping in 50ms increments until either we succeed or the clock moves on to a new second
+  4. Once the clock changes to a new second, start over at (1) with the fresh seconds-only string.
 
- This yields filenames that, in lexicographic order, generally  tend to match their creation order (even across different platforms), in GUI file browsers or results of `ls`, etc.
+ This yields filenames that, in lexicographic order (on most OS ), generally  tend to match their creation order (even across different platforms), in GUI file browsers or results of `ls`, etc.
 
  @param proposedFilename The proposed file name to write, including extension (if any), e.g. `'example.txt'`, `'foo.json'`, or `'config'`. If no file exists with that name yet (otherwise, it will have a lexicographically higher suffix appended, so that it is unique and is sorted after the existing files in the default sort order of most OSes)
 
@@ -30,7 +27,7 @@ import { WriteNewOptions } from './WriteNewOptions.ts';
  @returns The full path to the newly created file, including the unique suffix
 
  @throws Any error from the underlying file operations except for `AlreadyExists` which is handled internally
- */
+*/
 export async function writeNewFile(
   proposedFilename: string,
   content: string | Uint8Array,
