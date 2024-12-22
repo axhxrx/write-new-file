@@ -38,7 +38,7 @@ No changes other than fixing the JSR publishing automation.
 
 @masonmark: Well, this was harder than I expected, but here is the first working implementation of the actual atomic write with guaranteed-complete reads.
 
-### 🤖 2024-12-22: repo initialized by Bottie McBotface bot@axhxrx.com
+### 🤖 2024-12-22: repo initialized by Bottie McBotface 🤖@axhxrx.com
 
 Initial commit and monorepo sub-repo setup with @axhxrx/bot v.0.0.2
 
