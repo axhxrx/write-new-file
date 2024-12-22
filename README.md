@@ -26,7 +26,7 @@ However, it probably doesn't work on Windows. Such is life...😭
 
 ## Happenings
 
-### 👹 2024-12-22: v0.0.3
+### 👹 2024-12-22: v0.0.3 ~ v0.0.4
 
 No functionality changes, just various improvements to the docs and formatting.
 

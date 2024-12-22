@@ -1,11 +1,11 @@
 /**
-Returns a date string suitable for filenames, like "1975-09-05-02-34-56" by default.
+Returns a date string suitable for filenames, like `'1974-09-05-02-34-56'` by default.
 
 Although this date format is an abomination before science and mankind, we have a reason for not using the [One True Date Format](https://xkcd.com/1179/) — modern computers suck at naming files.
 
-You *can* make it more (human-)readable, like "1975-09-05 02:34:56" by passing ' ' and ':' for replaceSpaceWith and replaceColonWith, if you are willing to live with the filename consequences.
+You *can* make it more (human-)readable, like `'1975-09-05 02:34:56'` by passing `' '` and `':'` for `replaceSpaceWith` and `replaceColonWith`, if you are willing to live with the filename consequences.
 
-By default, though, both are replaced with '-' because this is intended for filenames, and funky chars are sus.
+By default, though, both are replaced with `'-'` because this is intended for filenames, and funky chars are sus.
 
 Uses your local timezone because that's usually what you want for files anyway.
 
@@ -17,7 +17,7 @@ Uses your local timezone because that's usually what you want for files anyway.
 
 @returns A filename-friendly date string formatted as YYYY-MM-DD{space}HH{colon}mm{colon}ss
 
-@throws {TypeError} If you give it something that's not actually a Date
+@throws {TypeError} Should never throw, unless you manage to pass a `date` value that that's not actually a `Date`.
 */
 export function formatDateForFilenameSuffix(
   date: Date,

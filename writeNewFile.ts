@@ -7,14 +7,16 @@ import { WriteNewOptions } from './WriteNewOptions.ts';
  Writes data to a unique file path using a date-based suffix, in a concurrency-safe manner. That is, if some other process or thread writes a file at the same time, we will fail, increment the suffix and try again, until we succeed at writing a new and uniquely-named file.
 
  The logic is:
-  1. If we can write the file with the proposed filename as-is, we're done. Otherwise:
-  2. For the "current second" of the clock, try a suffix like:
+
+ If we can write the file with the proposed filename as-is, we're done. Otherwise:
+
+  1. For the "current second" of the clock, try a suffix like:
       `'basename~YYYY-MM-DD HH:mm:ss.ext'`
-  3. If that fails because it already exists, repeatedly:
+  2. If that fails because it already exists, repeatedly:
       - Sleep 50ms
       - If the second is still the same, we try: `'basename~YYYY-MM-DD HH:mm:ss+SSS.ext'` (where `SSS` is the millisecond portion)
       - If that also exists, keep looping in 50ms increments until either we succeed or the clock moves on to a new second
-  4. Once the clock changes to a new second, start over at (1) with the fresh seconds-only string.
+  3. Once the clock changes to a new second, start over at (1) with the fresh seconds-only string.
 
  This yields filenames that, in lexicographic order (on most OS ), generally  tend to match their creation order (even across different platforms), in GUI file browsers or results of `ls`, etc.
 
