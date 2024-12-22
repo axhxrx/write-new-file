@@ -1,0 +1,1 @@
+This folder just needs to exist, but all the fixtures are created on the fly by the test.
