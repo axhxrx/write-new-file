@@ -14,6 +14,24 @@ example~2024-12-22-16-39-42+173.txt
 example~2024-12-22-16-39-42+225.txt
 ```
 
+Or, on the CLI:
+```bash
+URL="https://jsr.io/@axhxrx/write-new-file/0.0.4/mod.ts" \
+&& deno run -RW $URL fu-world.txt "🖕🌏" \
+&& deno run -RW $URL fu-world.txt "🖕🌏" \
+&& deno run -RW $URL fu-world.txt "🖕🌎" \
+&& deno run -RW $URL fu-world.txt "🖕🪐" ;
+/Volumes/CODE/@axhxrx/write-new-file/fu-world.txt
+/Volumes/CODE/@axhxrx/write-new-file/fu-world~2024-12-22-23-31-17.txt
+/Volumes/CODE/@axhxrx/write-new-file/fu-world~2024-12-22-23-31-17+716.txt
+/Volumes/CODE/@axhxrx/write-new-file/fu-world~2024-12-22-23-31-17+810.txt
+➜  write-new-file git:(main) ✗    
+➜  write-new-file git:(main) ✗ cat fu-world*
+🖕🌏🖕🌎🖕🪐🖕🌏%                                                                                                                                                                                  
+```
+
+(Note the ordering of the files' contents — first successful write wins.)
+
 The `writeNewFile()` implementation will keep trying unique file names until it succeeds in writing a file with a new and unique name. This should work even with multiple concurrent processes writing to the same directory.
 
 To achieve this, files are written atomically to a temporary file within the output directory — so watcher processes must ignore those temporary files. To make that easy, the temporary files have a prefix (by default, `'.__temp__'`), which can be ignored by the file consumers.
