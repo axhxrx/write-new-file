@@ -1,0 +1,6 @@
+{
+  "name": "@axhxrx/write-new-file",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "license": "MIT",
+}
