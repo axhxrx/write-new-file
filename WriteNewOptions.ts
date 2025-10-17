@@ -1,3 +1,5 @@
+import { cwd } from 'node:process';
+
 /**
  Options for writing new files. Currently just lets you set the output directory, with more options possibly, maybe, potentially coming in *el futuro* (e.g. a custom unique-filename-generator function).
 
@@ -23,7 +25,7 @@ class WriteNewOptionsDefaults
   static get defaultOptions(): WriteNewOptions
   {
     return this._defaultOptions ?? {
-      outputDirectory: Deno.cwd(),
+      outputDirectory: cwd(),
     };
   }
 

@@ -1,4 +1,5 @@
 import { format, parse } from '@std/path';
+import { readdirSync } from 'node:fs';
 import { formatDateForFilenameSuffix } from './formatDateForFilenameSuffix.ts';
 import { tryCreateFile } from './tryCreateFile.ts';
 import { WriteNewOptions } from './WriteNewOptions.ts';
@@ -41,11 +42,11 @@ export async function writeNewFile(
   try
   {
     // This check has to be sync to throw the error immediately. We do this check here instead of in `tryCreateFile()` because we don't want to slow down the main loop to throw a slightly better error message.
-    Deno.readDirSync(resolvedOptions.outputDirectory);
+    readdirSync(resolvedOptions.outputDirectory);
   }
   catch (error: unknown)
   {
-    if (error instanceof Deno.errors.NotFound)
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT')
     {
       throw new Error(`NobodyCannaCrossIt: The output directory "${resolvedOptions.outputDirectory}" does not exist.`);
     }

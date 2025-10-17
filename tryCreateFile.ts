@@ -1,3 +1,5 @@
+import { open, link, unlink } from 'node:fs/promises';
+
 /**
  Attempt to create the file with the specified path. If it fails because it already exists, catch the error, and try again. If it fails for something else, just rethrow.
 
@@ -13,7 +15,7 @@
 
  @returns `true` if the file was successfully created, `false` if it already existed
 
- @throws Any error other than `Deno.errors.AlreadyExists` that occurs while attempting to create the file — e.g. disk full, permission error, etc
+ @throws Any error other than EEXIST that occurs while attempting to create the file — e.g. disk full, permission error, etc
 */
 export async function tryCreateFile(
   path: string,
@@ -29,14 +31,8 @@ export async function tryCreateFile(
 
   try
   {
-    // `createNew: true` will throw Deno.errors.AlreadyExists if the file is present. That's concurrency-safe on the writing side.
-    const file = await Deno.open(
-      tempPath,
-      {
-        write: true,
-        createNew: true,
-      },
-    );
+    // 'wx' flag: open for writing, fails if file exists (equivalent to createNew: true in Deno)
+    const file = await open(tempPath, 'wx');
     try
     {
       await file.write(data);
@@ -46,7 +42,7 @@ export async function tryCreateFile(
     }
     finally
     {
-      file.close();
+      await file.close();
     }
     /*
      @masonmark 2024-12-22: Wow, I was under a pretty major misapprehension about atomic writes in Deno. I thought `Deno.rename()` would be our jam, but in fact it only allows atomic writes — there's no way to detect/avoid overwriting an existing file.
@@ -55,7 +51,7 @@ export async function tryCreateFile(
 
      I almost bailed on writing this in Deno — because there *are* other ways to do it, although they smell like fermented soybeans...
 
-     But in this specific use case, I think Deno.link() meets all our requirements. It's atomic, and it fails if the target file already exists.
+     But in this specific use case, I think link() meets all our requirements. It's atomic, and it fails if the target file already exists.
 
       The main downsides of link() are:
 
@@ -72,20 +68,20 @@ export async function tryCreateFile(
      So, since our mission here is to write temp files within a single directory, and then  The atomic guarantee from link() is worth these (hopefully-)theoretical downsides.
     */
 
-    await Deno.link(tempPath, path);
+    await link(tempPath, path);
     return true;
     // ☢️ WARNING! OLD EXTREMELY WRONG CODE FOLLOWS, FOR REFERENCE: ☢️
     //
     // This will also throw `.AlreadyExists` if the file already exists, so any other error should probably actually be rethrown. (NO, IT DOESN'T!!!)
     //
-    // await Deno.rename(tempPath, path);
+    // await rename(tempPath, path);
     // return true;
     //
     // ☢️ END OLD EXTREMELY WRONG CODE ☢️
   }
   catch (err: unknown)
   {
-    if (err instanceof Deno.errors.AlreadyExists)
+    if (err && typeof err === 'object' && 'code' in err && err.code === 'EEXIST')
     {
       return false;
     }
@@ -95,7 +91,7 @@ export async function tryCreateFile(
   {
     try
     {
-      await Deno.remove(tempPath);
+      await unlink(tempPath);
     }
     catch
     {

@@ -1,32 +1,27 @@
 #!/usr/bin/env deno run --allow-read --allow-write
 
 import { parseArgs } from '@std/cli';
-import { readAll } from '@std/io';
+import { argv, exit } from 'node:process';
 import { writeNewFile } from './writeNewFile.ts';
 
 const usage = `
-Usage: 
-  ./main.ts [options] <proposedFilename> [content]
-
-Or:  
-  deno run -RW ./mod.ts [options] <proposedFilename> [content]
+Usage:
+  ./main.ts [options] <proposedFilename> <content>
 
 Or:
-  deno run -RW https://jsr.io/@axhx/write-new-file/mod.ts [options] <proposedFilename> [content]
+  deno run -RW ./mod.ts [options] <proposedFilename> <content>
+
+Or:
+  deno run -RW https://jsr.io/@axhx/write-new-file/mod.ts [options] <proposedFilename> <content>
 
 Options:
   --help, -h          Show this help
   --dir, -d           Output directory (defaults to current working directory)
-  --from-stdin, -i    Read content from stdin if not provided as an argument
 
 Examples:
   deno run --allow-read --allow-write mod.ts myFile.txt "text content"
 
   deno run -RW mod.ts --dir=output myFile.txt "more text content 👋"
-
-  deno run -RW mod.ts --from-stdin myFile.txt
-
-  echo "so great" | deno run -RW mod.ts --from-stdin myGreatFile.txt
 
 Purpose:
   Write content to a new file in a concurrency-safe manner.
@@ -50,33 +45,23 @@ export async function main(): Promise<void>
     _: positionalArgs,
     help,
     dir,
-    'from-stdin': fromStdin,
-  } = parseArgs(Deno.args, {
+  } = parseArgs(argv.slice(2), {
     string: ['dir'],
-    boolean: ['help', 'from-stdin'],
-    alias: { h: 'help', d: 'dir', i: 'from-stdin' },
+    boolean: ['help'],
+    alias: { h: 'help', d: 'dir' },
   });
 
-  if (help || positionalArgs.length < 1)
+  if (help || positionalArgs.length < 2)
   {
     console.log(usage);
-    Deno.exit(0);
+    exit(0);
   }
 
   // The first positional arg is always the proposed filename:
   const proposedFilename = String(positionalArgs[0]);
 
-  // If there's a second positional arg, assume it's the content
-  let content = (positionalArgs.length > 1)
-    ? String(positionalArgs[1])
-    : '';
-
-  // Optionally read from stdin if content wasn't already provided:
-  if (!content && fromStdin)
-  {
-    const rawStdin = await readAll(Deno.stdin);
-    content = new TextDecoder().decode(rawStdin);
-  }
+  // The second positional arg is the content
+  const content = String(positionalArgs[1]);
 
   // If the user specified a directory, put that in the options (otherwise, don't pass any options so that the default options will be used):
   const options = (typeof dir === 'string' && dir.length > 0)
@@ -88,11 +73,11 @@ export async function main(): Promise<void>
     // Actually write the file via writeNewFile()
     const actualPath = await writeNewFile(proposedFilename, content, options);
     console.log(`${actualPath}`);
-    Deno.exit(0);
+    exit(0);
   }
   catch (err)
   {
     console.error(`Error writing file: ${err}`);
-    Deno.exit(1);
+    exit(1);
   }
 }
