@@ -1,2 +1,3 @@
 .DS_Store
-writeNewFile.fixtures/test*
+writeNewFile.test-tmp/
+.claude/settings.local.json
