@@ -1,4 +1,4 @@
-import { open, link, unlink } from 'node:fs/promises';
+import { link, open, unlink } from 'node:fs/promises';
 
 /**
  Attempt to create the file with the specified path. If it fails because it already exists, catch the error, and try again. If it fails for something else, just rethrow.
